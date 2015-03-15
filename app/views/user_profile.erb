@@ -1,0 +1,15 @@
+<% if session[:username]%>
+  <p><%="You signed in, #{@user.username}!"%></p>
+
+  <form action='/tweet/new' method='post'>
+    <input type='hidden' name='user_id' value='<%= @user.id %>'>
+    <input type='text' name='content' placeholder='Tweet how youre feelin'>
+    <input type='submit' value='Tweet it'>
+  </form>
+
+  <%Tweet.where(user_id: @user.id).each do |tweet|%>
+    <%= tweet.content %>
+  <%end%>
+
+  <a href='/logout'>Log out!</a>
+<% end %>
