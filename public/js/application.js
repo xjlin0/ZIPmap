@@ -2,6 +2,31 @@ $(document).ready(function() {
     // This is called after the document has loaded in its entirety
     // This guarantees that any elements we bind to will exist on the page
     // when we try to bind to them
+    function onEachFeature(feature, layer) {
+        if (feature.properties) {
+            var popupString = '<div class="popup">';
+            for (var k in feature.properties) {
+                var v = feature.properties[k];
+                popupString += k + ': ' + v + '<br />';
+            }
+            popupString += '</div>';
+            layer.bindPopup(popupString);
+        }
+        if (!(layer instanceof L.Point)) {
+            layer.on('mouseover', function() {
+                layer.setStyle(hoverStyle);
+            });
+            layer.on('mouseout', function() {
+                layer.setStyle(style);
+            });
+        }
+    }
+
+    function getColor(d) {
+            return d > 25000000 ? '#800026' :
+                d > 1000000 ? '#FED976' :
+                '#FFEDA0';
+        } //CA 29760021      NV 1201833
 
     // $('#map').css('height', $(window).height() - 250).css('border-radius', '5px')
     $('#map').css('height', '400px').css('border-radius', '5px')
@@ -12,6 +37,9 @@ $(document).ready(function() {
         attribution: '&copy; ' + mapLink + ' Contributors',
         maxZoom: 18,
     }).addTo(map);
+    L.control.scale({
+        metric: false
+    }).addTo(map); // show scale on the map (lower left)
 
     var redIcon = L.icon({
         iconUrl: '/js/images/r-icon.png',
@@ -46,26 +74,6 @@ $(document).ready(function() {
     };
 
     // http://gis.stackexchange.com/questions/48522/geoserver-callback-function-undefinded
-    function onEachFeature(feature, layer) {
-        if (feature.properties) {
-            var popupString = '<div class="popup">';
-            for (var k in feature.properties) {
-                var v = feature.properties[k];
-                popupString += k + ': ' + v + '<br />';
-            }
-            popupString += '</div>';
-            layer.bindPopup(popupString);
-        }
-        if (!(layer instanceof L.Point)) {
-            layer.on('mouseover', function() {
-                layer.setStyle(hoverStyle);
-            });
-            layer.on('mouseout', function() {
-                layer.setStyle(style);
-            });
-        }
-    }
-
 
     var geojsonURL = "http://localhost:8080/geoserver/topp/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=topp:states&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
 
@@ -73,14 +81,6 @@ $(document).ready(function() {
         style: style,
         onEachFeature: onEachFeature
     });
-
-
-    function getColor(d) {
-            return d > 25000000 ? '#800026' :
-                   d > 1000000  ? '#FED976' :
-                                  '#FFEDA0' ;
-        } //CA 29760021      NV 1201833
-
 
     $.ajax({
             url: geojsonURL,
@@ -91,9 +91,19 @@ $(document).ready(function() {
             geojsonLayer.addData(data);
             geojsonLayer.eachLayer(function(layer) {
                 layer.setStyle({
-                    fillColor: getColor(layer.feature.properties.PERSONS)
-                })
-            }); //set fill color according to population, change "PERSONS" later
+                        fillColor: getColor(layer.feature.properties.PERSONS)
+                    }) //set fill color according to population, change "PERSONS" later
+                layer.bindLabel('HOUSHOLD: ' + layer.feature.properties.HOUSHOLD, {
+                    noHide: true,
+                    direction: 'auto'
+                }); //this moves with mouse curser
+//http://stackoverflow.com/questions/13316925/simple-label-on-a-leaflet-geojson-polygon
+                label = new L.Label();  //preparing static labels for each polygon
+                label.setContent(layer.feature.properties.STATE_ABBR);
+                label.setLatLng(layer.getBounds().getCenter());
+                map.showLabel(label);  // required to show static labels
+            });
+
         })
         .fail(function() {
             console.log("error");
