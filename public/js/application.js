@@ -3,11 +3,10 @@ $(document).ready(function() {
     // This guarantees that any elements we bind to will exist on the page
     // when we try to bind to them
 
-
     // $('#map').css('height', $(window).height() - 250).css('border-radius', '5px')
-    $('#map').css('height', '400px' ).css('border-radius', '5px')
+    $('#map').css('height', '400px').css('border-radius', '5px')
     var mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
-    var map = L.map('map').setView([37.7749295, -122.4194155], 17);
+    var map = L.map('map').setView([37.7749295, -122.4194155], 7);
     // console.log(map.getBounds().toBBoxString());
     L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; ' + mapLink + ' Contributors',
@@ -34,82 +33,64 @@ $(document).ready(function() {
 
     marker.bindPopup("SFC").openPopup();
 
-    // var baseLayer = new L.TileLayer(cloudmadeUrl, { attribution: cloudmadeAttribution});
-    // map.addLayer(baseLayer);
+    var style = {
+        "clickable": true,
+        "color": "#00D",
+        "fillColor": "#00D",
+        "weight": 1.0,
+        "opacity": 0.3,
+        "fillOpacity": 0.2
+    };
+    var hoverStyle = {
+        "fillOpacity": 0.5
+    };
 
-    // var style = {
-    //     "clickable": true,
-    //     "color": "#00D",
-    //     "fillColor": "#00D",
-    //     "weight": 1.0,
-    //     "opacity": 0.3,
-    //     "fillOpacity": 0.2
-    // };
-    // var hoverStyle = {
-    //     "fillOpacity": 0.5
-    // };
 
-    // var geojsonURL = "http://localhost:8080/geoserver/topp/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=topp:states&outputFormat=application/json&bbox=" + map.getBounds().toBBoxString();
-    // // console.log(map.getBounds().toBBoxString());
-    // console.log("haha53")
-    // console.log(geojsonURL)
+    // http://gis.stackexchange.com/questions/48522/geoserver-callback-function-undefinded
+    function onEachFeature(feature, layer) {
+        if (feature.properties) {
+            var popupString = '<div class="popup">';
+            for (var k in feature.properties) {
+                var v = feature.properties[k];
+                popupString += k + ': ' + v + '<br />';
+            }
+            popupString += '</div>';
+            layer.bindPopup(popupString);
+        }
+        if (!(layer instanceof L.Point)) {
+            layer.on('mouseover', function() {
+                layer.setStyle(hoverStyle);
+            });
+            layer.on('mouseout', function() {
+                layer.setStyle(style);
+            });
+        }
+    }
 
-// // var jsonTest = new L.GeoJSON.AJAX("test.geojson",{onEachFeature:popUp});
-    // var jsonpTest = L.geoJson.ajax(geojsonURL,{dataType:"jsonp"});
-    // var jsonpResponse = L.geoJson.ajax(geojsonURL,{dataType:"jsonp"});
-// var jsonpTest = L.geoJson(ttt)
-    // map.addLayer(jsonpTest);
 
-// http://gis.stackexchange.com/questions/48522/geoserver-callback-function-undefinded
+    var geojsonURL = "http://localhost:8080/geoserver/topp/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=topp:states&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
 
-var geojsonURL = "http://localhost:8080/geoserver/topp/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=topp:states&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
+    var geojsonLayer = new L.GeoJSON(null, {
+        style: style,
+        onEachFeature: onEachFeature
+    });
 
-var geojsonLayer = new L.GeoJSON();
 
-function handleJson(data) { console.log(data);  geojsonLayer.addData(data); }
+    $.ajax({
+            url: geojsonURL,
+            dataType: 'jsonp',
+            jsonpCallback: 'getJson'
+        })
+        .done(function handleJson(data) {
+            geojsonLayer.addData(data);
+        })
+        .fail(function() {
+            console.log("error");
+        })
+        .always(function() {
+            console.log("complete");
+        });
 
-$.ajax({url : geojsonURL, dataType : 'jsonp', jsonpCallback: 'getJson', success: handleJson });
+    map.addLayer(geojsonLayer);
 
-map.addLayer(geojsonLayer);
-
-    // var geojsonURL = 'http://vector.mapzen.com/osm/pois/{z}/{x}/{y}.json';
-    // var geojsonTileLayer = new L.TileLayer.GeoJSON(geojsonURL, {
-    //     clipTiles: true,
-    //     unique: function(feature) {
-    //         return feature.id;
-    //     }
-    // }, {
-    //     style: style,
-    //     onEachFeature: function(feature, layer) {
-    //         if (feature.properties) {
-    //             var popupString = '<div class="popup">';
-    //             for (var k in feature.properties) {
-    //                 var v = feature.properties[k];
-    //                 popupString += k + ': ' + v + '<br />';
-    //             }
-    //             popupString += '</div>';
-    //             layer.bindPopup(popupString);
-    //         }
-    //         if (!(layer instanceof L.Point)) {
-    //             layer.on('mouseover', function() {
-    //                 layer.setStyle(hoverStyle);
-    //             });
-    //             layer.on('mouseout', function() {
-    //                 layer.setStyle(style);
-    //             });
-    //         }
-    //     }
-    // });
-  //  map.addLayer(geojsonTileLayer);
-
-    //  begin to add cell tower data coordination
-    // var ts = L.markerClusterGroup();
-
-    // for (tower in towers50json){
-    //   var title = Object.keys(tower)[0]
-    //   var marker = L.marker(new L.LatLng(towers50json[tower].latitude, towers50json[tower].longitude), { title: title });
-    //   marker.bindPopup(title);
-    //   ts.addLayer(marker);
-    // }
-    // map.addLayer(ts);
 });
