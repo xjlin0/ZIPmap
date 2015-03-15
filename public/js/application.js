@@ -36,7 +36,7 @@ $(document).ready(function() {
     var style = {
         "clickable": true,
         "color": "#00D",
-        "fillColor": "#00D",
+        // "fillColor": "#00D",  #decided later
         "weight": 1.0,
         "opacity": 0.3,
         "fillOpacity": 0.2
@@ -44,7 +44,6 @@ $(document).ready(function() {
     var hoverStyle = {
         "fillOpacity": 0.5
     };
-
 
     // http://gis.stackexchange.com/questions/48522/geoserver-callback-function-undefinded
     function onEachFeature(feature, layer) {
@@ -76,6 +75,13 @@ $(document).ready(function() {
     });
 
 
+    function getColor(d) {
+            return d > 25000000 ? '#800026' :
+                   d > 1000000  ? '#FED976' :
+                                  '#FFEDA0' ;
+        } //CA 29760021      NV 1201833
+
+
     $.ajax({
             url: geojsonURL,
             dataType: 'jsonp',
@@ -83,6 +89,11 @@ $(document).ready(function() {
         })
         .done(function handleJson(data) {
             geojsonLayer.addData(data);
+            geojsonLayer.eachLayer(function(layer) {
+                layer.setStyle({
+                    fillColor: getColor(layer.feature.properties.PERSONS)
+                })
+            }); //set fill color according to population, change "PERSONS" later
         })
         .fail(function() {
             console.log("error");
