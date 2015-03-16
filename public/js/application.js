@@ -23,20 +23,20 @@ $(document).ready(function() {
     }
 
     function getColor(d) {
-            return  d > 50000000 ? '#800026' :
-                    d > 20000000 ? '#BD0026' :
-                    d > 10000000 ? '#E31A1C' :
-                    d > 5000000 ? '#FC4E2A' :
-                    d > 2000000 ? '#FD8D3C' :
-                    d > 1000000 ? '#FEB24C' :
-                    d > 500000 ? '#FED976' :
-                    '#FFEDA0';
+            return d > 50000000 ? '#800026' :
+                d > 20000000 ? '#BD0026' :
+                d > 10000000 ? '#E31A1C' :
+                d > 5000000 ? '#FC4E2A' :
+                d > 2000000 ? '#FD8D3C' :
+                d > 1000000 ? '#FEB24C' :
+                d > 500000 ? '#FED976' :
+                '#FFEDA0';
         } //CA 29760021      NV 1201833  WY 450000
 
     // $('#map').css('height', $(window).height() - 250).css('border-radius', '5px')
     $('#map').css('height', '500px').css('border-radius', '5px')
     var mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
-    var map = L.map('map').setView([37.7749295, -122.4194155], 7);
+    var map = L.map('map').setView([37.7749295, -122.4194155], 17);
 
     L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; ' + mapLink + ' Contributors',
@@ -87,7 +87,7 @@ $(document).ready(function() {
     map.on('moveend resize', function() {
         // How can I cache the previously got JSON?
 
-        var geojsonURL = "http://localhost:8080/geoserver/topp/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=topp:states&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
+        var geojsonURL = "http://localhost:8080/geoserver/zcta510/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=zcta510:zcta510&maxFeatures=50&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
 
         $.ajax({
                 url: geojsonURL,
@@ -101,7 +101,7 @@ $(document).ready(function() {
                     layer.setStyle({
                             fillColor: getColor(layer.feature.properties.PERSONS)
                         }) //set fill color according to population, change "PERSONS" later
-                    layer.bindLabel('HOUSHOLD: ' + layer.feature.properties.HOUSHOLD, {
+                    layer.bindLabel('ALAND10: ' + layer.feature.properties.ALAND10, {
                         noHide: true,
                         direction: 'auto'
                     }); //this bindLabel moves with the mouse curser
@@ -109,7 +109,7 @@ $(document).ready(function() {
                     var myTextLabel = L.marker(layer.getBounds().getCenter(), {
                         icon: L.divIcon({
                             className: 'text-labels', // Set class for CSS styling
-                            html: layer.feature.properties.STATE_ABBR
+                            html: layer.feature.properties.ZCTA5CE10
                         }),
                         // draggable: true, // Allow label dragging...?
                         zIndexOffset: 1000 // Make appear above other map features
