@@ -23,16 +23,21 @@ $(document).ready(function() {
     }
 
     function getColor(d) {
-            return d > 25000000 ? '#800026' :
-                d > 1000000 ? '#FED976' :
-                '#FFEDA0';
-        } //CA 29760021      NV 1201833
+            return  d > 50000000 ? '#800026' :
+                    d > 20000000 ? '#BD0026' :
+                    d > 10000000 ? '#E31A1C' :
+                    d > 5000000 ? '#FC4E2A' :
+                    d > 2000000 ? '#FD8D3C' :
+                    d > 1000000 ? '#FEB24C' :
+                    d > 500000 ? '#FED976' :
+                    '#FFEDA0';
+        } //CA 29760021      NV 1201833  WY 450000
 
     // $('#map').css('height', $(window).height() - 250).css('border-radius', '5px')
-    $('#map').css('height', '400px').css('border-radius', '5px')
+    $('#map').css('height', '500px').css('border-radius', '5px')
     var mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
     var map = L.map('map').setView([37.7749295, -122.4194155], 7);
-    // console.log(map.getBounds().toBBoxString());
+
     L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; ' + mapLink + ' Contributors',
         maxZoom: 18,
@@ -67,51 +72,58 @@ $(document).ready(function() {
         // "fillColor": "#00D",  #decided later
         "weight": 1.0,
         "opacity": 0.3,
-        "fillOpacity": 0.2
+        "fillOpacity": 0.3
     };
     var hoverStyle = {
         "fillOpacity": 0.5
     };
 
     // http://gis.stackexchange.com/questions/48522/geoserver-callback-function-undefinded
-
-    var geojsonURL = "http://localhost:8080/geoserver/topp/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=topp:states&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
-
     var geojsonLayer = new L.GeoJSON(null, {
         style: style,
         onEachFeature: onEachFeature
-    });
+    }); // initialize new GeoJSON object with style&functions for incoming Ajax loading
 
-    $.ajax({
-            url: geojsonURL,
-            dataType: 'jsonp',
-            jsonpCallback: 'getJson'
-        })
-        .done(function handleJson(data) {
-            geojsonLayer.addData(data);
-            geojsonLayer.eachLayer(function(layer) {
-                layer.setStyle({
-                        fillColor: getColor(layer.feature.properties.PERSONS)
-                    }) //set fill color according to population, change "PERSONS" later
-                layer.bindLabel('HOUSHOLD: ' + layer.feature.properties.HOUSHOLD, {
-                    noHide: true,
-                    direction: 'auto'
-                }); //this moves with mouse curser
-//http://stackoverflow.com/questions/13316925/simple-label-on-a-leaflet-geojson-polygon
-                label = new L.Label();  //preparing static labels for each polygon
-                label.setContent(layer.feature.properties.STATE_ABBR);
-                label.setLatLng(layer.getBounds().getCenter());
-                map.showLabel(label);  // required to show static labels
+    map.on('moveend resize', function() {
+        // How can I cache the previously got JSON?
+
+        var geojsonURL = "http://localhost:8080/geoserver/topp/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=topp:states&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
+
+        $.ajax({
+                url: geojsonURL,
+                dataType: 'jsonp',
+                jsonpCallback: 'getJson'
+            })
+            .done(function handleJson(data) {
+                geojsonLayer.clearLayers();
+                geojsonLayer.addData(data);
+                geojsonLayer.eachLayer(function(layer) {
+                    layer.setStyle({
+                            fillColor: getColor(layer.feature.properties.PERSONS)
+                        }) //set fill color according to population, change "PERSONS" later
+                    layer.bindLabel('HOUSHOLD: ' + layer.feature.properties.HOUSHOLD, {
+                        noHide: true,
+                        direction: 'auto'
+                    }); //this bindLabel moves with the mouse curser
+
+                    var myTextLabel = L.marker(layer.getBounds().getCenter(), {
+                        icon: L.divIcon({
+                            className: 'text-labels', // Set class for CSS styling
+                            html: layer.feature.properties.STATE_ABBR
+                        }),
+                        // draggable: true, // Allow label dragging...?
+                        zIndexOffset: 1000 // Make appear above other map features
+                    });
+                    myTextLabel.addTo(layer);
+                });
+            }).fail(function() {
+                console.log("error");
+            }).always(function() {
+                console.log("complete");
             });
 
-        })
-        .fail(function() {
-            console.log("error");
-        })
-        .always(function() {
-            console.log("complete");
-        });
+        map.addLayer(geojsonLayer);
 
-    map.addLayer(geojsonLayer);
+    });
 
 });

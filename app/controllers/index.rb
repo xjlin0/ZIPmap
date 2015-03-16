@@ -9,7 +9,7 @@ get '/user/signup' do # render sign-up page
 end
 
 post '/user/signup' do  # sign-up a new user
-  # p "index.rb line 14"
+
   new_user = User.new(params)
   if new_user.save
     session[:user_id] = new_user.id  #Anne: login after register
@@ -27,7 +27,7 @@ get '/user/login' do
 end
 
 post '/user/login' do
-  # p "index.rb line 31"
+
   p attempting_user = User.find_by(username: params[:username]).try(:authenticate, params[:password])
   p attempting_user
   if !!attempting_user
@@ -52,10 +52,3 @@ get '/user/spots' do
   end
 end
 
-get '/map' do
-  p la = params[:latitude]#.to_f
-  p lo = params[:longitude]#.to_f
-  p params[:latency].to_i
-
-  erb "<div class='alert alert-message'>Your identity won't be recorded unless logged in</div>"
-end
