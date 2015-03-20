@@ -75,7 +75,7 @@ $(document).ready(function() {
         "fillOpacity": 0.3
     };
     var hoverStyle = {
-        "fillOpacity": 0.5
+        "fillOpacity": 0.6
     };
 
     // http://gis.stackexchange.com/questions/48522/geoserver-callback-function-undefinded
@@ -87,7 +87,9 @@ $(document).ready(function() {
     map.on('moveend resize', function() {
         // How can I cache the previously got JSON?
 
-        var geojsonURL = "http://localhost:8080/geoserver/zcta510/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=zcta510:zcta510&maxFeatures=50&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
+        var geojsonURL = "http://localhost:8080/geoserver/combine/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=100&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
+
+        // var geojsonURL = "http://localhost:8080/geoserver/zcta510/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=zcta510:zcta510&maxFeatures=100&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
 
         $.ajax({
                 url: geojsonURL,
@@ -95,6 +97,7 @@ $(document).ready(function() {
                 jsonpCallback: 'getJson'
             })
             .done(function handleJson(data) {
+                console.log(data)
                 geojsonLayer.clearLayers();
                 geojsonLayer.addData(data);
                 geojsonLayer.eachLayer(function(layer) {
