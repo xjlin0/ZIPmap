@@ -23,18 +23,18 @@ $(document).ready(function() {
     }
 
     function getColor(d) {
-            return d > 50000000 ? '#800026' :
-                d > 20000000 ? '#BD0026' :
-                d > 10000000 ? '#E31A1C' :
-                d > 5000000 ? '#FC4E2A' :
-                d > 2000000 ? '#FD8D3C' :
-                d > 1000000 ? '#FEB24C' :
-                d > 500000 ? '#FED976' :
+            return d > 50000 ? '#800026' :
+                d > 20000 ? '#BD0026' :
+                d > 10000 ? '#E31A1C' :
+                d > 5000 ? '#FC4E2A' :
+                d > 2000 ? '#FD8D3C' :
+                d > 1000 ? '#FEB24C' :
+                d > 500 ? '#FED976' :
                 '#FFEDA0';
         } //CA 29760021      NV 1201833  WY 450000
 
-    // $('#map').css('height', $(window).height() - 250).css('border-radius', '5px')
-    $('#map').css('height', '500px').css('border-radius', '5px')
+    $('#map').css('height', $(window).height() - 200).css('border-radius', '5px')
+    // $('#map').css('height', '500px').css('border-radius', '5px')
     var mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
     var map = L.map('map').setView([37.7749295, -122.4194155], 17);
 
@@ -87,7 +87,7 @@ $(document).ready(function() {
     map.on('moveend resize', function() {
         // How can I cache the previously got JSON?
 
-        var geojsonURL = "http://localhost:8080/geoserver/combine/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=100&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
+        var geojsonURL = "http://localhost:8080/geoserver/combine/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=200&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
 
         // var geojsonURL = "http://localhost:8080/geoserver/zcta510/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=zcta510:zcta510&maxFeatures=100&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
 
@@ -102,11 +102,12 @@ $(document).ready(function() {
                 geojsonLayer.addData(data);
                 geojsonLayer.eachLayer(function(layer) {
                     layer.setStyle({
-                            fillColor: getColor(layer.feature.properties.PERSONS)
+                            fillColor: getColor(layer.feature.properties.HC01_VC03) //population
                         }) //set fill color according to population, change "PERSONS" later
-                    layer.bindLabel('ALAND10: ' + layer.feature.properties.ALAND10, {
+                    layer.bindLabel('median age: ' + layer.feature.properties.HC01_VC23, {
                         noHide: true,
-                        direction: 'auto'
+                        direction: 'auto',
+                        className: 'popup'
                     }); //this bindLabel moves with the mouse curser
 
                     var myTextLabel = L.marker(layer.getBounds().getCenter(), {
@@ -114,7 +115,7 @@ $(document).ready(function() {
                             className: 'text-labels', // Set class for CSS styling
                             html: layer.feature.properties.ZCTA5CE10
                         }),
-                        // draggable: true, // Allow label dragging...?
+                        draggable: true, // Allow label dragging...
                         zIndexOffset: 1000 // Make appear above other map features
                     });
                     myTextLabel.addTo(layer);
