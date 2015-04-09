@@ -72,6 +72,10 @@ $(document).ready(function() {
         metric: false
     }).addTo(map); // show scale on the map (lower left)
 
+    //queryUrl= 'http://localhost:8080/geoserver/zcta510/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zcta510:zcta510&outputFormat=text/javascript&format_options=callback:callback&featuretype&CQL_FILTER=ZCTA5CE10='
+
+    //map.addControl( new L.Control.Search({ url:'queryUrl{s}', jsonpParam:'callback', text:'Color...', markerLocation: true}) );
+
     var redIcon = L.icon({
         iconUrl: '/js/images/r-icon.png',
         shadowUrl: '/js/images/r-shadow.png',
