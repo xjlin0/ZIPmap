@@ -22,16 +22,41 @@ $(document).ready(function() {
         }
     }
 
+
+    // function getColor(d) {
+    //         return d > 50000 ? '#800026' :
+    //             d > 20000 ? '#BD0026' :
+    //             d > 10000 ? '#E31A1C' :
+    //             d > 5000 ? '#FC4E2A' :
+    //             d > 2000 ? '#FD8D3C' :
+    //             d > 1000 ? '#FEB24C' :
+    //             d > 500 ? '#FED976' :
+    //             '#FFEDA0';
+    //     }  //original series from http://leafletjs.com/examples/choropleth.html, looked bad and redish
     function getColor(d) {
-            return d > 50000 ? '#800026' :
-                d > 20000 ? '#BD0026' :
-                d > 10000 ? '#E31A1C' :
-                d > 5000 ? '#FC4E2A' :
-                d > 2000 ? '#FD8D3C' :
-                d > 1000 ? '#FEB24C' :
-                d > 500 ? '#FED976' :
-                '#FFEDA0';
-        } //CA 29760021      NV 1201833  WY 450000
+            return d > 50000 ? '#49527a' :
+                d > 20000 ? '#626da3' :
+                d > 10000 ? '#7a89cc' :
+                d > 5000 ? '#93a4f5' :
+                d > 2000 ? '#9daeff' :
+                d > 1000 ? '#adbcff' :
+                d > 500 ? '#bec9ff' :
+                '#ced7ff';
+        }   // Katie's suggestion on blue //CA 29760021      NV 1201833  WY 450000
+
+
+    // function getColor(d) {
+    //         return d > 50000 ? '#524c38' :
+    //             d > 20000 ? '#7a7254' :
+    //             d > 10000 ? '#a3986f' :
+    //             d > 5000 ? '#ccbe8b' :
+    //             d > 2000 ? '#f5e4a7' :
+    //             d > 1000 ? '#ffeeb1' :
+    //             d > 500 ? '#fff1b1' :
+    //             '#fff4cb';
+    //     }  // Hannah's suggestion, looked grey out
+
+
 
     $('#map').css('height', $(window).height() - 200).css('border-radius', '5px')
     // $('#map').css('height', '500px').css('border-radius', '5px')
@@ -104,7 +129,7 @@ $(document).ready(function() {
                     layer.setStyle({
                             fillColor: getColor(layer.feature.properties.HC01_VC03) //population
                         }) //set fill color according to population, change "PERSONS" later
-                    layer.bindLabel('median age: ' + layer.feature.properties.HC01_VC23, {
+                    layer.bindLabel(layer.feature.properties.ZCTA5CE10 + ' median age: ' + layer.feature.properties.HC01_VC23, {
                         noHide: true,
                         direction: 'auto',
                         className: 'popup'
