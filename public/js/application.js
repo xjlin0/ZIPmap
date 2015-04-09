@@ -63,6 +63,7 @@ $(document).ready(function() {
     var mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
     var map = L.map('map').setView([37.7749295, -122.4194155], 17);
 
+
     L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; ' + mapLink + ' Contributors',
         maxZoom: 18,
@@ -109,6 +110,29 @@ $(document).ready(function() {
         onEachFeature: onEachFeature
     }); // initialize new GeoJSON object with style&functions for incoming Ajax loading
 
+//http://labs.easyblog.it/maps/leaflet-search/examples/ajax-jquery.html
+
+    // function searchByAjax(text, callResponse)//callback for 3rd party ajax requests
+    // {
+    //     return $.ajax({
+    //         url: 'http://localhost:8080/geoserver/zcta510/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zcta510:zcta510&outputFormat=text/javascript&format_options=callback:getJson&featuretype&CQL_FILTER=ZCTA5CE10='+text,
+    //         type: 'GET',
+    //         dataType: 'jsonp',
+    //         jsonpCallback: 'getJson'
+    //         success: function(json) {
+    //             callResponse(json);
+    //         }
+    //     });
+    // }
+
+    // map.addControl( new L.Control.Search({callData: searchByAjax, text:'search zip code', markerLocation: true}) );
+
+    //queryUrl= 'http://localhost:8080/geoserver/zcta510/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zcta510:zcta510&outputFormat=text/javascript&featuretype&CQL_FILTER=ZCTA5CE10='
+
+    // map.addControl( new L.Control.Search({ url:queryUrl+'{s}', text:'search zip code..', markerLocation: true}) );
+
+
+
     map.on('moveend resize', function() {
         // How can I cache the previously got JSON?
 
@@ -122,7 +146,7 @@ $(document).ready(function() {
                 jsonpCallback: 'getJson'
             })
             .done(function handleJson(data) {
-                console.log(data)
+                // console.log(data)
                 geojsonLayer.clearLayers();
                 geojsonLayer.addData(data);
                 geojsonLayer.eachLayer(function(layer) {
@@ -154,5 +178,4 @@ $(document).ready(function() {
         map.addLayer(geojsonLayer);
 
     });
-
 });
