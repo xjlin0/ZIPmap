@@ -61,7 +61,7 @@ $(document).ready(function() {
     $('#map').css('height', $(window).height() - 200).css('border-radius', '5px')
     // $('#map').css('height', '500px').css('border-radius', '5px')
     var mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
-    var map = L.map('map').setView([37.7749295, -122.4194155], 17);
+    var map = L.map('map').setView([37.784633, -122.397414], 15);
 
 
     L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -72,9 +72,9 @@ $(document).ready(function() {
         metric: false
     }).addTo(map); // show scale on the map (lower left)
 
-    //queryUrl= 'http://localhost:8080/geoserver/zcta510/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zcta510:zcta510&outputFormat=text/javascript&format_options=callback:callback&featuretype&CQL_FILTER=ZCTA5CE10='
+    // queryUrl= 'http://localhost:8080/geoserver/zcta510/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zcta510:zcta510&outputFormat=text/javascript&format_options=callback:callback&featuretype&CQL_FILTER=ZCTA5CE10=';
 
-    //map.addControl( new L.Control.Search({ url:'queryUrl{s}', jsonpParam:'callback', text:'Color...', markerLocation: true}) );
+    // map.addControl( new L.Control.Search({ url:queryUrl+'{s}', jsonpParam:'callback', text:'Color...', markerLocation: true}) );
 
     var redIcon = L.icon({
         iconUrl: '/js/images/r-icon.png',
@@ -86,7 +86,7 @@ $(document).ready(function() {
         popupAnchor: [1, -46] // point from which the popup should open relative to the iconAnchor
     });
 
-    var marker = L.marker([37.7749295, -122.4194155], {
+    var marker = L.marker([37.784633, -122.397414], {
         icon: redIcon,
         bounceOnAdd: true,
         bounceOnAddOptions: {
@@ -94,7 +94,7 @@ $(document).ready(function() {
         },
     }).addTo(map);
 
-    marker.bindPopup("SFC").openPopup();
+    marker.bindPopup("DBC rocks!").openPopup();
 
     var style = {
         "clickable": true,
@@ -116,21 +116,6 @@ $(document).ready(function() {
 
 //http://labs.easyblog.it/maps/leaflet-search/examples/ajax-jquery.html
 
-    // function searchByAjax(text, callResponse)//callback for 3rd party ajax requests
-    // {
-    //     return $.ajax({
-    //         url: 'http://localhost:8080/geoserver/zcta510/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zcta510:zcta510&outputFormat=text/javascript&format_options=callback:getJson&featuretype&CQL_FILTER=ZCTA5CE10='+text,
-    //         type: 'GET',
-    //         dataType: 'jsonp',
-    //         jsonpCallback: 'getJson'
-    //         success: function(json) {
-    //             callResponse(json);
-    //         }
-    //     });
-    // }
-
-    // map.addControl( new L.Control.Search({callData: searchByAjax, text:'search zip code', markerLocation: true}) );
-
     //queryUrl= 'http://localhost:8080/geoserver/zcta510/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zcta510:zcta510&outputFormat=text/javascript&featuretype&CQL_FILTER=ZCTA5CE10='
 
     // map.addControl( new L.Control.Search({ url:queryUrl+'{s}', text:'search zip code..', markerLocation: true}) );
@@ -140,9 +125,9 @@ $(document).ready(function() {
     map.on('moveend resize', function() {
         // How can I cache the previously got JSON?
 
-        var geojsonURL = "http://localhost:8080/geoserver/combine/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=200&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
+        //var geojsonURL = "http://localhost:8080/geoserver/combine/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=200&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
 
-        // var geojsonURL = "http://localhost:8080/geoserver/zcta510/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=zcta510:zcta510&maxFeatures=100&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
+        var geojsonURL = "http://ec2-52-8-27-38.us-west-1.compute.amazonaws.com:8080/geoserver/combine/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=200&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
 
         $.ajax({
                 url: geojsonURL,
