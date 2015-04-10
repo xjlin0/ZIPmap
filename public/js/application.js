@@ -111,7 +111,8 @@ $(document).ready(function() {
     // http://gis.stackexchange.com/questions/48522/geoserver-callback-function-undefinded
     var geojsonLayer = new L.GeoJSON(null, {
         style: style,
-        onEachFeature: onEachFeature
+        // onEachFeature: onEachFeature
+        onEachFeature:
     }); // initialize new GeoJSON object with style&functions for incoming Ajax loading
 
 //http://labs.easyblog.it/maps/leaflet-search/examples/ajax-jquery.html
@@ -125,7 +126,14 @@ $(document).ready(function() {
     map.on('moveend resize', function() {
         // How can I cache the previously got JSON?
 
-        //var geojsonURL = "http://localhost:8080/geoserver/combine/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=200&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
+        //var geojsonURL = "http://localhost:8080/geoserver/combine/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=200&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();  //working are overlay for localhost
+
+//http://ec2-52-8-27-38.us-west-1.compute.amazonaws.com:8080/geoserver/combine/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=2&outputFormat=text/javascript  #working for normal query at EC2
+
+
+//http://ec2-52-8-27-38.us-west-1.compute.amazonaws.com:8080/geoserver/combine/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=combine:combined&outputFormat=text/javascript&CQL_FILTER=ZCTA5CE10=94546  //why this does not work on EC2?
+
+//http://localhost:8080/geoserver/combine/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=combine:combined&outputFormat=text/javascript&CQL_FILTER=ZCTA5CE10=94546  //working for query at localhost
 
         var geojsonURL = "http://ec2-52-8-27-38.us-west-1.compute.amazonaws.com:8080/geoserver/combine/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=200&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
 
