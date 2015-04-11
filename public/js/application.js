@@ -38,7 +38,7 @@ $(document).ready(function() {
     }
 
     function getColor(d) {
-            return d > 50000 ? '#49527a' :
+        return d > 50000 ? '#49527a' :
                 d > 20000 ? '#626da3' :
                 d > 10000 ? '#7a89cc' :
                 d > 5000 ? '#93a4f5' :
@@ -121,7 +121,6 @@ $(document).ready(function() {
                 jsonpCallback: 'getJson'
             })
             .done(function(data) {
-                // console.log(data)
                 geojsonLayer.clearLayers();
                 geojsonLayer.addData(data);
                 geojsonLayer.eachLayer(function(layer) {
@@ -154,18 +153,6 @@ $(document).ready(function() {
 
     });
 
-    // function getColor(d) {
-    //         return d > 50000 ? '#49527a' :
-    //             d > 20000 ? '#626da3' :
-    //             d > 10000 ? '#7a89cc' :
-    //             d > 5000 ? '#93a4f5' :
-    //             d > 2000 ? '#9daeff' :
-    //             d > 1000 ? '#adbcff' :
-    //             d > 500 ? '#bec9ff' :
-    //             '#ced7ff';
-    // } // Katie's suggestion on blue //CA 29760021      NV 1201833  WY 450000
-
-
     // http://leafletjs.com/examples/choropleth.html  legend:
     var legend = L.control({
         position: 'bottomright'
@@ -177,13 +164,11 @@ $(document).ready(function() {
             grades = [0, 500, 1000, 2000, 5000, 10000, 20000, 50000],
             labels = [];
 
-        // loop through our density intervals and generate a label with a colored square for each interval
         for (var i = 0; i < grades.length; i++) {
             div.innerHTML +=
                 '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
                 grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
-        }
-
+        } // loop through our density intervals and generate a label with a colored square for each interval
         return div;
     };
 
