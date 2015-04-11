@@ -15,7 +15,7 @@ gem 'rake'
 gem 'puma'
 
 gem 'bcrypt'   #for using has_secure_password
-#gem 'rack-flash3' #Zac's suggestion for rack flash
+gem 'rack-flash3' #Zac's suggestion for rack flash
 group :test do
   gem 'shoulda-matchers'
   gem 'rack-test'
