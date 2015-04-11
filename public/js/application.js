@@ -1,17 +1,32 @@
 $(document).ready(function() {
-    // This is called after the document has loaded in its entirety
-    // This guarantees that any elements we bind to will exist on the page
-    // when we try to bind to them
+    var x = document.getElementById("demo");
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(p) {
+                map.setView([p.coords.latitude, p.coords.longitude], 13);
+            })
+        } else {
+            x.innerHTML = "Geolocation is not supported by this browser.";
+        }
+    }
+
     function onEachFeature(feature, layer) {
         if (feature.properties) {
-            var popupString = '<div class="popup">';
-            for (var k in feature.properties) {
-                var v = feature.properties[k];
-                popupString += k + ': ' + v + '<br />';
-            }
+            var popupString = '<div class="popup">' + feature.properties.ZCTA5CE10 + ':<br />';
+            // for (var k in feature.properties) {
+            //     var v = feature.properties[k];
+            //     popupString += k + ': ' + v + '<br />';
+            // }  // works for take all properties in the JSON
+            var population = feature.properties.HC01_VC03;
+            var age = feature.properties.HC01_VC23;
+            var income = feature.properties['2_EST_VC02']; //need to recheck
+            popupString += 'Population' + ': ' + population + '<br />';
+            popupString += 'Median age' + ': ' + age + '<br />';
+            popupString += 'Median household income' + ':<br />' + income + '<br />';
             popupString += '</div>';
             layer.bindPopup(popupString);
-        }
+        } // this shows only population, age and income
         if (!(layer instanceof L.Point)) {
             layer.on('mouseover', function() {
                 layer.setStyle(hoverStyle);
@@ -19,20 +34,9 @@ $(document).ready(function() {
             layer.on('mouseout', function() {
                 layer.setStyle(style);
             });
-        }
+        } // changing area fillOpacity when mousehover
     }
 
-
-    // function getColor(d) {
-    //         return d > 50000 ? '#800026' :
-    //             d > 20000 ? '#BD0026' :
-    //             d > 10000 ? '#E31A1C' :
-    //             d > 5000 ? '#FC4E2A' :
-    //             d > 2000 ? '#FD8D3C' :
-    //             d > 1000 ? '#FEB24C' :
-    //             d > 500 ? '#FED976' :
-    //             '#FFEDA0';
-    //     }  //original series from http://leafletjs.com/examples/choropleth.html, looked bad and redish
     function getColor(d) {
             return d > 50000 ? '#49527a' :
                 d > 20000 ? '#626da3' :
@@ -42,27 +46,17 @@ $(document).ready(function() {
                 d > 1000 ? '#adbcff' :
                 d > 500 ? '#bec9ff' :
                 '#ced7ff';
-        }   // Katie's suggestion on blue //CA 29760021      NV 1201833  WY 450000
+        } // Katie's suggestion on blue //CA 29760021      NV 1201833  WY 450000
 
 
-    // function getColor(d) {
-    //         return d > 50000 ? '#524c38' :
-    //             d > 20000 ? '#7a7254' :
-    //             d > 10000 ? '#a3986f' :
-    //             d > 5000 ? '#ccbe8b' :
-    //             d > 2000 ? '#f5e4a7' :
-    //             d > 1000 ? '#ffeeb1' :
-    //             d > 500 ? '#fff1b1' :
-    //             '#fff4cb';
-    //     }  // Hannah's suggestion, looked grey out
-
-
+    $('.navbar-brand').on('click', function(event) {
+        event.preventDefault();
+        getLocation();
+    });
 
     $('#map').css('height', $(window).height() - 200).css('border-radius', '5px')
-    // $('#map').css('height', '500px').css('border-radius', '5px')
     var mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
-    var map = L.map('map').setView([37.784633, -122.397414], 15);
-
+    var map = L.map('map').setView([37.784633, -122.397414], 15); //DBC location
 
     L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; ' + mapLink + ' Contributors',
@@ -71,10 +65,6 @@ $(document).ready(function() {
     L.control.scale({
         metric: false
     }).addTo(map); // show scale on the map (lower left)
-
-    // queryUrl= 'http://localhost:8080/geoserver/zcta510/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zcta510:zcta510&outputFormat=text/javascript&format_options=callback:callback&featuretype&CQL_FILTER=ZCTA5CE10=';
-
-    // map.addControl( new L.Control.Search({ url:queryUrl+'{s}', jsonpParam:'callback', text:'Color...', markerLocation: true}) );
 
     var redIcon = L.icon({
         iconUrl: '/js/images/r-icon.png',
@@ -99,7 +89,7 @@ $(document).ready(function() {
     var style = {
         "clickable": true,
         "color": "#00D",
-        // "fillColor": "#00D",  #decided later
+        // "fillColor": "#00D",  #will change by function getColor() later
         "weight": 1.0,
         "opacity": 0.3,
         "fillOpacity": 0.3
@@ -111,38 +101,26 @@ $(document).ready(function() {
     // http://gis.stackexchange.com/questions/48522/geoserver-callback-function-undefinded
     var geojsonLayer = new L.GeoJSON(null, {
         style: style,
-        // onEachFeature: onEachFeature
-        onEachFeature:
+        onEachFeature: onEachFeature
     }); // initialize new GeoJSON object with style&functions for incoming Ajax loading
-
-//http://labs.easyblog.it/maps/leaflet-search/examples/ajax-jquery.html
-
-    //queryUrl= 'http://localhost:8080/geoserver/zcta510/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=zcta510:zcta510&outputFormat=text/javascript&featuretype&CQL_FILTER=ZCTA5CE10='
-
-    // map.addControl( new L.Control.Search({ url:queryUrl+'{s}', text:'search zip code..', markerLocation: true}) );
-
-
 
     map.on('moveend resize', function() {
         // How can I cache the previously got JSON?
 
-        //var geojsonURL = "http://localhost:8080/geoserver/combine/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=200&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();  //working are overlay for localhost
+        //http://ec2-52-8-27-38.us-west-1.compute.amazonaws.com:8080/geoserver/combine/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=combine:combined&outputFormat=text/javascript&CQL_FILTER=ZCTA5CE10=94546  //working slow on EC2, 5 minute!!
 
-//http://ec2-52-8-27-38.us-west-1.compute.amazonaws.com:8080/geoserver/combine/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=2&outputFormat=text/javascript  #working for normal query at EC2
+        //http://localhost:8080/geoserver/combine/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=combine:combined&outputFormat=text/javascript&CQL_FILTER=ZCTA5CE10=94546  //working for query one zcta at localhost
 
+        var geojsonURL = "http://ec2-52-8-27-38.us-west-1.compute.amazonaws.com:8080/geoserver/combine/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=200&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString(); //working for typical overlay on EC2
 
-//http://ec2-52-8-27-38.us-west-1.compute.amazonaws.com:8080/geoserver/combine/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=combine:combined&outputFormat=text/javascript&CQL_FILTER=ZCTA5CE10=94546  //why this does not work on EC2?
-
-//http://localhost:8080/geoserver/combine/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=combine:combined&outputFormat=text/javascript&CQL_FILTER=ZCTA5CE10=94546  //working for query at localhost
-
-        var geojsonURL = "http://ec2-52-8-27-38.us-west-1.compute.amazonaws.com:8080/geoserver/combine/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=200&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString();
+        //var geojsonURL = "http://localhost:8080/geoserver/combine/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=200&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString(); //working for overlay on localhost
 
         $.ajax({
                 url: geojsonURL,
-                dataType: 'jsonp',
+                dataType: 'jsonp', // using jsonp to overcome CORS
                 jsonpCallback: 'getJson'
             })
-            .done(function handleJson(data) {
+            .done(function(data) {
                 // console.log(data)
                 geojsonLayer.clearLayers();
                 geojsonLayer.addData(data);
@@ -175,4 +153,42 @@ $(document).ready(function() {
         map.addLayer(geojsonLayer);
 
     });
+
+    // function getColor(d) {
+    //         return d > 50000 ? '#49527a' :
+    //             d > 20000 ? '#626da3' :
+    //             d > 10000 ? '#7a89cc' :
+    //             d > 5000 ? '#93a4f5' :
+    //             d > 2000 ? '#9daeff' :
+    //             d > 1000 ? '#adbcff' :
+    //             d > 500 ? '#bec9ff' :
+    //             '#ced7ff';
+    // } // Katie's suggestion on blue //CA 29760021      NV 1201833  WY 450000
+
+
+    // http://leafletjs.com/examples/choropleth.html  legend:
+    var legend = L.control({
+        position: 'bottomright'
+    });
+
+    legend.onAdd = function(map) {
+
+        var div = L.DomUtil.create('div', 'info legend'),
+            grades = [0, 500, 1000, 2000, 5000, 10000, 20000, 50000],
+            labels = [];
+
+        // loop through our density intervals and generate a label with a colored square for each interval
+        for (var i = 0; i < grades.length; i++) {
+            div.innerHTML +=
+                '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+        }
+
+        return div;
+    };
+
+    legend.addTo(map);
+
+
+
 });

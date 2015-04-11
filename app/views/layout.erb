@@ -33,7 +33,8 @@
              <span class="icon-bar"></span>
              <span class="icon-bar"></span>
            </button>
-           <a class="navbar-brand" href="/">Zip code map</a>
+          <!--  <a class="navbar-brand" href="#">Check my area</a>  -->
+          <button type="button" class="navbar-brand btn btn-default">Check my area</button>
          </div>
          <div class="navbar-collapse collapse">
            <ul class="nav navbar-nav">
@@ -66,8 +67,9 @@
 
        <p id="demo"></p>
        <div id="map"></div>
-     </div>
-      <footer><br><br><p>Data source: demographic and housing estimates from U.S. census bureau, 2009-2013 5-year American community survey and median income in 2013 (in 2013 inflation-adjusted dollars) based on ZCTA (ZIP Code Tabulation Areas). Overlay color reflects the population of each area. In case the ZCTA codes overlaps, please drag and drop to better place. ZCTA codes may not be as same as zip codes. The map is only for reference.</p></footer>
+       <footer>
+      <div class='panel-footer'>
+      <br><br><p>Data source: demographic and housing estimates from U.S. census bureau, <a href="http://www.census.gov/data/developers/updates/acs-5-yr-summary-available-2009-2013.html">2009-2013 5-year American community survey</a> and median income in 2013 (in 2013 inflation-adjusted dollars) based on ZCTA (ZIP Code Tabulation Areas). Overlay color reflects the population of each area. In case the ZCTA codes misplaced, please drag and drop to a better place. ZCTA codes may not be the same as zip codes. Please be patient about the loading speed of census data due to the free account limit. The map is only for reference.</p></footer></div>
      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
      <script src="/vendor/jquery-1.9.1.min.js"></script>
      <!-- Include all compiled plugins (below), or include individual files as needed -->
