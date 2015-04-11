@@ -90,6 +90,8 @@ GEM
     puma (2.11.1)
       rack (>= 1.1, < 2.0)
     rack (1.5.2)
+    rack-flash3 (1.0.5)
+      rack
     rack-protection (1.5.3)
       rack
     rack-test (0.6.2)
@@ -147,6 +149,7 @@ DEPENDENCIES
   pg
   psych
   puma
+  rack-flash3
   rack-test
   rake
   rspec
