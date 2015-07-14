@@ -38,7 +38,7 @@ $(document).ready(function() {
     }
 
     function getColor(d) {
-        return d > 50000 ? '#49527a' :
+            return d > 50000 ? '#49527a' :
                 d > 20000 ? '#626da3' :
                 d > 10000 ? '#7a89cc' :
                 d > 5000 ? '#93a4f5' :
@@ -111,14 +111,15 @@ $(document).ready(function() {
 
         //http://localhost:8080/geoserver/combine/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=combine:combined&outputFormat=text/javascript&CQL_FILTER=ZCTA5CE10=94546  //working for query one zcta at localhost
 
-        var geojsonURL = "http://ec2-52-8-27-38.us-west-1.compute.amazonaws.com:8080/geoserver/combine/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=200&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString(); //working for typical overlay on EC2
+        //var geojsonURL = "http://ec2-52-8-27-38.us-west-1.compute.amazonaws.com:8080/geoserver/combine/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=200&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString(); //working for typical overlay on EC2
 
-        //var geojsonURL = "http://localhost:8080/geoserver/combine/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=200&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString(); //working for overlay on localhost
+        var geojsonURL = "http://localhost:8080/geoserver/combine/ows?service=wfs&version=1.0.0&request=GetFeature&typeName=combine:combined&maxFeatures=200&outputFormat=text/javascript&format_options=callback:getJson&bbox=" + map.getBounds().toBBoxString(); //working for overlay on localhost
 
         $.ajax({
                 url: geojsonURL,
                 dataType: 'jsonp', // using jsonp to overcome CORS
-                jsonpCallback: 'getJson'
+                jsonpCallback: 'getJson',
+                cache: true
             })
             .done(function(data) {
                 geojsonLayer.clearLayers();
@@ -174,6 +175,9 @@ $(document).ready(function() {
 
     legend.addTo(map);
 
+    // map.addControl(new L.Control.Search({layer: geojsonLayer }));  //didn't work
+    queryUrl= 'http://localhost:8080/geoserver/combine/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=combine:combine&outputFormat=text/javascript&CQL_FILTER=ZCTA5CE10=';
 
+    //map.addControl( new L.Control.Search({layer: geojsonLayer, url:queryUrl+'{s}', jsonpParam:'callback', text:'Color...', markerLocation: true}) );  //didn't work
 
 });
